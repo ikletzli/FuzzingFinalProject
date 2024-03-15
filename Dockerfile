@@ -1,47 +1,37 @@
-FROM aflplusplus/aflplusplus
+FROM node:16
 
-ARG TARGETPLATFORM
-# install zellij
-RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then ARCHITECTURE=x86_64; elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then ARCHITECTURE=arm; elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=x86_64; fi && \
-  apt-get update && \
-  apt-get install -y curl && \
-  curl -L "https://github.com/zellij-org/zellij/releases/latest/download/zellij-${ARCHITECTURE}-unknown-linux-musl.tar.gz" | tar xz && \
-  mv zellij /usr/local/bin/ && \
-  rm -rf zellij-* && \
-  apt-get remove -y curl && \
-  rm -rf /var/lib/apt/lists/*
+WORKDIR /usr/src
 
-# install htop
-RUN apt-get update && \
-  apt-get install -y htop && \
-  rm -rf /var/lib/apt/lists/*
+RUN git clone https://github.com/modrinth/theseus.git && \
+    mv theseus/theseus_gui . && rm -rf theseus && cd theseus_gui
 
-# RUN git clone https://github.com/fuzzstati0n/fuzzgoat /src && \
-#   cd /src && \
-#   make
+WORKDIR /usr/src/theseus_gui
 
-ENV CC="afl-gcc"
+RUN npm install && \
+    npm install -g jest && \
+    npm install -g @vue/cli && \
+    npm audit fix --force && \
+    npm install @vue/cli-plugin-unit-jest @vue/test-utils
 
-RUN git clone https://github.com/libarchive/libarchive.git /src && \
-  cd /src && \
-  cmake . && \
-  make
+RUN mkdir __tests__ && \
+    sed -i '10i\"test\": \"node --experimental-vm-modules node_modules/jest/bin/jest.js\",' package.json
 
-RUN cd /src && \
-  git clone --depth=1 https://github.com/corkami/pocs && \
-  mkdir seeds && \
-  mv pocs/zip/*.zip ./seeds && \
-  mv pocs/rar/*.rar ./seeds
+RUN npm install @vue/vue3-jest@27
 
-ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/src/libarchive"
+RUN npm install --save-dev @babel/preset-env
 
-COPY layout.kdl /etc/zellij/layout.kdl
-COPY run_nodes.py /src/run_nodes.py
-COPY analyze.py /src/analyze.py
+RUN npm install --save-dev @vue/cli-plugin-babel
 
-COPY fuzz_harness.cc /src/fuzz_harness.cc
-RUN cd /src && \
-  afl-g++ -o ./fuzz_harness fuzz_harness.cc -I/src/libarchive -L/src/libarchive -larchive -Wl,--trace 
+RUN npm install --save-dev babel-core@bridge
 
-ENV SHELL="/usr/bin/bash"
-CMD ["/usr/local/bin/zellij", "--layout", "/etc/zellij/layout.kdl"]
+COPY package.json ./package.json
+
+COPY app.spec.js __tests__/app.spec.js
+
+COPY babel.config.json ./babel.config.json
+
+COPY theseus_gui/src/helpers/profile.js ./src/helpers/profile.mjs
+
+COPY theseus_gui/src/pages/instance/Mods.vue ./src/pages/instance/Mods.vue
+
+COPY theseus_gui/src/components/ui/ExportModal.vue ./src/components/ui/ExportModal.vue
