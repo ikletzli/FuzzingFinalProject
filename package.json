@@ -13,8 +13,6 @@
         "transformIgnorePatterns": ["./__tests__"],
         "moduleFileExtensions": ["js", "json", "vue"],
         "transform": {
-          "^.+/src/.+\\.js$": "babel-jest",
-          "^.+\\.vue$": "@vue/vue3-jest"
         },
         "moduleNameMapper": {
             "^@/(.*)$": "<rootDir>/src/$1"
