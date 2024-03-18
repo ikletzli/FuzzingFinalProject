@@ -6,9 +6,9 @@ import Mods from '@/pages/instance/Mods.vue';
 
 describe('Mods.vue', () => {
   it('checks the addition logic', () => {
-    // const wrapper = shallowMount(Mods);
+    const wrapper = shallowMount(Mods);
 
-    // const componentText = wrapper.text();
-    // expect(componentText).toContain('Actions');
+    const componentText = wrapper.text();
+    expect(componentText).toContain('Actions');
   });
 });

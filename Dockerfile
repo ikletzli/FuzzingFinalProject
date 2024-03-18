@@ -26,7 +26,7 @@ RUN npm install --save-dev babel-core@bridge
 
 COPY package.json ./package.json
 
-COPY app.spec.js __tests__/app.spec.js
+#COPY app.spec.js __tests__/app.spec.js
 
 COPY babel.config.json ./babel.config.json
 
@@ -35,3 +35,11 @@ COPY theseus_gui/src/helpers/profile.js ./src/helpers/profile.mjs
 COPY theseus_gui/src/pages/instance/Mods.vue ./src/pages/instance/Mods.vue
 
 COPY theseus_gui/src/components/ui/ExportModal.vue ./src/components/ui/ExportModal.vue
+
+COPY theseus_gui/src/components/ui/ModpackVersionModal.vue ./src/components/ui/ModpackVersionModal.vue
+
+COPY search.spec.js __tests__/search.spec.js
+
+COPY browse_test.js ./browse_test.js
+
+RUN npm test

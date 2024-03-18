@@ -1,11 +1,13 @@
 <script setup>
 import { Button, Checkbox, Modal, XIcon, PlusIcon } from 'omorphia'
-import { PackageIcon, VersionIcon } from '@/assets/icons'
+const { PackageIcon, VersionIcon } = require('@/assets/icons');
+
 import { ref } from 'vue'
-import { export_profile_mrpack, get_pack_export_candidates } from '@/helpers/profile.js'
-import { open } from '@tauri-apps/api/dialog'
-import { handleError } from '@/store/notifications.js'
-import { useTheming } from '@/store/theme'
+const { export_profile_mrpack, get_pack_export_candidates } = require('@/helpers/profile.js');
+const { open } = require('@tauri-apps/api/dialog');
+const { handleError } = require('@/store/notifications.js');
+const { useTheming } = require('@/store/theme');
+
 
 const props = defineProps({
   instance: {

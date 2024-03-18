@@ -394,21 +394,21 @@ import {
 } from 'omorphia'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import {
+const {
   add_project_from_path,
   get,
   remove_project,
   toggle_disable_project,
   update_all,
   update_project,
-} from '@/helpers/profile.js'
-import { handleError } from '@/store/notifications.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
-import { open } from '@tauri-apps/api/dialog'
-import { listen } from '@tauri-apps/api/event'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { highlightModInProfile } from '@/helpers/utils.js'
-import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } from '@/assets/icons'
+} = require('@/helpers/profile.js');
+const { handleError } = require('@/helpers/notifications.js');
+const { mixpanel_track } = require('@/helpers/mixpanel.js');
+const { open } = require('@tauri-apps/api/dialog');
+const { listen } = require('@tauri-apps/api/event');
+const { convertFileSrc } = require('@tauri-apps/api/tauri');
+const { highlightModInProfile } = require('@/helpers/utils.js');
+const { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } = require('@/assets/icons');
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 
