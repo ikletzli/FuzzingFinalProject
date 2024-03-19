@@ -23,6 +23,21 @@
     Pagination,
     DropdownSelect } = require('omorphia');
 
+    const { list } = require('@/helpers/profile.js');
+    const { handleError } = require('@/store/notifications.js');
+
+  async function myFunction(query) {
+      const profiles = await list(true).catch(handleError)
+      const instances = shallowRef(Object.values(profiles))
+  }
+
+  module.exports = {
+    myFunction,
+};
+
+  const profiles = await list(true).catch(handleError)
+  const instances = shallowRef(Object.values(profiles))
+
   const projects = ref([])
 
   const initProjects = (initInstance) => {
