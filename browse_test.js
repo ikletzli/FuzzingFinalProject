@@ -1,5 +1,4 @@
-import {
-    Avatar,
+  const {     Avatar,
     Button,
     TrashIcon,
     Card,
@@ -22,8 +21,7 @@ import {
     ShareModal,
     CodeIcon,
     Pagination,
-    DropdownSelect,
-  } from 'omorphia'
+    DropdownSelect } = require('omorphia');
 
   const projects = ref([])
 
