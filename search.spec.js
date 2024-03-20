@@ -3,7 +3,7 @@
 
 import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
-import { myFunction } from '../browse_test.js';
+import { myFunction } from '../src/browse_test.js';
 
 test('the data is peanut butter', async () => {
   const query = ref('')

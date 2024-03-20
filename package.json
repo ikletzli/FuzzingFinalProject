@@ -10,7 +10,7 @@
                 "babelConfig": false
               }
         },
-        "transformIgnorePatterns": ["./__tests__"],
+        "transformIgnorePatterns": ["./__tests__", "./src"],
         "moduleFileExtensions": ["js", "json", "vue"],
         "transform": {
         },

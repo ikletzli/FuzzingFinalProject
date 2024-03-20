@@ -2,10 +2,9 @@ FROM node:16
 
 WORKDIR /usr/src
 
-RUN git clone https://github.com/modrinth/theseus.git && \
-    mv theseus/theseus_gui . && rm -rf theseus && cd theseus_gui
+RUN git clone https://github.com/modrinth/theseus.git
 
-WORKDIR /usr/src/theseus_gui
+WORKDIR /usr/src/theseus/theseus_gui
 
 RUN npm install && \
     npm install -g jest && \
@@ -13,33 +12,20 @@ RUN npm install && \
     npm audit fix --force && \
     npm install @vue/cli-plugin-unit-jest @vue/test-utils
 
-RUN mkdir __tests__ && \
-    sed -i '10i\"test\": \"node --experimental-vm-modules node_modules/jest/bin/jest.js\",' package.json
-
-RUN npm install @vue/vue3-jest@27
-
-RUN npm install --save-dev @babel/preset-env
-
-RUN npm install --save-dev @vue/cli-plugin-babel
-
-RUN npm install --save-dev babel-core@bridge
+RUN mkdir __tests__
 
 COPY package.json ./package.json
 
-#COPY app.spec.js __tests__/app.spec.js
-
-COPY babel.config.json ./babel.config.json
-
-COPY theseus_gui/src/helpers/profile.js ./src/helpers/profile.mjs
-
-COPY theseus_gui/src/pages/instance/Mods.vue ./src/pages/instance/Mods.vue
-
-COPY theseus_gui/src/components/ui/ExportModal.vue ./src/components/ui/ExportModal.vue
-
-COPY theseus_gui/src/components/ui/ModpackVersionModal.vue ./src/components/ui/ModpackVersionModal.vue
-
 COPY search.spec.js __tests__/search.spec.js
 
-COPY browse_test.js ./browse_test.js
+COPY browse_test.js ./src/browse_test.js
 
-RUN npm test
+RUN curl --proto -y '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+COPY theseus/theseus_gui/src-tauri/Cargo.toml ./src-tauri/Cargo.toml
+
+COPY theseus/theseus_gui/src-tauri/src/api/profile.rs ./src-tauri/src/api/profile.rs
+
+RUN apt update && apt -y install libsoup2.4-dev && apt install libpango1.0-dev && apt install libatk1.0-dev && apt install javascriptcoregtk-4.0 && apt install gdk-3.0
+
+#RUN npm test
