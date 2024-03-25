@@ -43,7 +43,6 @@ import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
 import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 import { install_from_file } from './helpers/pack'
-import { create } from '@/helpers/profile'
 
 const themeStore = useTheming()
 const urlModal = ref(null)
@@ -77,12 +76,12 @@ defineExpose({
     const version = await getVersion()
     showOnboarding.value = !fully_onboarded
 
-    await create(
-    'test',
-    '1.20.4',
-    'fabric',
-    'stable',
-  ).catch(handleError)
+  //   await create(
+  //   'test',
+  //   '1.20.4',
+  //   'fabric',
+  //   'stable',
+  // ).catch(handleError)
 
   // const instancePath = props.instance.metadata
   //   ? `/instance/${encodeURIComponent(props.instance.path)}/`
