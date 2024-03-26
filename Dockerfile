@@ -26,23 +26,31 @@ apt -y install librust-gdk-dev && apt -y install libwebkit2gtk-4.0-dev && apt -y
 
 COPY App.vue ./src/App.vue
 
+COPY RowDisplay.vue ./src/components/RowDisplay.vue
+
 RUN npm run build
 
 COPY io.rs ../theseus/src/util/io.rs
+
+COPY main.rs ./src-tauri/src/main.rs
 
 COPY mod.rs ../theseus/src/launcher/mod.rs
 
 RUN curl --proto -y '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
     . "$HOME/.cargo/env" && cargo build --bin theseus_gui 
 
-COPY test.jar /root/.config/com.modrinth.theseus/profiles/test/mods/test.jar
+#COPY test.jar /root/.config/com.modrinth.theseus/profiles/test/mods/test.jar
+
+COPY test.jar test.jar
 
 COPY profile.json /root/.config/com.modrinth.theseus/profiles/test/profile.json
+
+RUN mkdir /root/.config/com.modrinth.theseus/profiles/test/mods
 
 # RUN curl -O https://cdn.azul.com/zulu/bin/zulu17.48.15-ca-jre17.0.10-linux_x64.zip && unzip zulu17.48.15-ca-jre17.0.10-linux_x64.zip && \
 #     curl -O https://cdn.azul.com/zulu/bin/zulu8.76.0.17-ca-jre8.0.402-linux_x64.zip && unzip zulu8.76.0.17-ca-jre8.0.402-linux_x64.zip
 
-CMD ["../target/debug/theseus_gui"]
+CMD ["../target/debug/theseus_gui", "test.jar"]
 
 # #RUN npm test
 
