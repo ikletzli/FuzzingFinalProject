@@ -34,9 +34,11 @@ RUN apt-get update && \
 RUN git clone https://github.com/AFLplusplus/AFLplusplus && \
     cd AFLplusplus && make distrib && make install
 
-COPY App.vue ./src/App.vue
+COPY App2.vue ./src/App.vue
 
 COPY RowDisplay.vue ./src/components/RowDisplay.vue
+
+COPY Index.vue ./src/pages/Index.vue
 
 RUN npm run build
 
@@ -61,4 +63,4 @@ RUN mkdir /root/.config/com.modrinth.theseus/profiles/test/mods
 
 RUN mkdir in && mkdir out && cd in && touch test.jar && truncate -s +1 test.jar && cd ..
 
-CMD ["../target/debug/theseus_gui", "test.jar"]
+CMD ["../target/debug/theseus_gui", "worldmap.jar"]
