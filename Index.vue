@@ -104,7 +104,7 @@ onUnmounted(() => {
   <div class="page-container">
     <Mods
       v-if="total > 0"
-      :instance=instance
+      :instance="instance"
       :can-paginate="true"
     />
   </div>
