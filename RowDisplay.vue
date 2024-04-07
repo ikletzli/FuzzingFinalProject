@@ -64,10 +64,6 @@ const modInstallModal = ref(null)
 const themeStore = useTheming()
 const currentDeleteInstance = ref(null)
 
-await router.push({
-        path: `/instance/${encodeURIComponent("test")}/`,
-      })
-
 async function deleteProfile() {
   if (currentDeleteInstance.value) {
     await remove(currentDeleteInstance.value).catch(handleError)
@@ -211,6 +207,10 @@ const handleOptionsClick = async (args) => {
 const maxInstancesPerRow = ref(1)
 const maxProjectsPerRow = ref(1)
 
+const goToRoute = async () => await router.push({
+        path: `/instance/${encodeURIComponent("test")}/`,
+      })
+
 const calculateCardsPerRow = () => {
   // Calculate how many cards fit in one row
   const containerWidth = rows.value[0].clientWidth
@@ -221,9 +221,10 @@ const calculateCardsPerRow = () => {
   maxProjectsPerRow.value = Math.floor((containerWidthInRem + 1) / 19)
 }
 
-onMounted(() => {
+onMounted(async () => {
   calculateCardsPerRow()
   window.addEventListener('resize', calculateCardsPerRow)
+  goToRoute()
 })
 
 onUnmounted(() => {

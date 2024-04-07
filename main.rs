@@ -158,8 +158,4 @@ fn main() {
             is_dev,
             toggle_decorations,
         ]);
-
-    builder
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
 }

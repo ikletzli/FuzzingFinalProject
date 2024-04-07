@@ -12,17 +12,10 @@ RUN npm install && \
     npm audit fix --force && \
     npm install @vue/cli-plugin-unit-jest @vue/test-utils
 
-RUN mkdir __tests__
-
-COPY package.json ./package.json
-
-COPY search.spec.js __tests__/search.spec.js
-
-COPY browse_test.js ./src/browse_test.js
-
 RUN apt update && apt -y install libsoup2.4-dev && apt -y install libpango1.0-dev && \
-apt -y install libatk1.0-dev && apt -y install javascriptcoregtk-4.0 && apt -y install gdk-3.0 && \
-apt -y install librust-gdk-dev && apt -y install libwebkit2gtk-4.0-dev && apt -y install xvfb 
+apt -y install libatk1.0-dev && apt -y install javascriptcoregtk-4.0 && apt -y install gdk-3.0
+
+RUN apt update && apt -y install librust-gdk-dev && apt -y install libwebkit2gtk-4.0-dev && apt -y install xvfb 
 
 # get afl++
 RUN apt-get update && \
@@ -34,9 +27,21 @@ RUN apt-get update && \
 RUN git clone https://github.com/AFLplusplus/AFLplusplus && \
     cd AFLplusplus && make distrib && make install
 
-COPY App.vue ./src/App.vue
+RUN mkdir __tests__
+
+COPY package.json ./package.json
+
+COPY search.spec.js __tests__/search.spec.js
+
+COPY browse_test.js ./src/browse_test.js
+
+COPY App2.vue ./src/App.vue
 
 COPY RowDisplay.vue ./src/components/RowDisplay.vue
+
+COPY Index.vue ./src/pages/Index.vue
+
+COPY main.js ./src/main.js
 
 RUN npm run build
 

@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onUnmounted, shallowRef, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import RowDisplay from '@/components/RowDisplay.vue'
 import { list } from '@/helpers/profile.js'
 import { offline_listener, profile_listener } from '@/helpers/events'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
@@ -92,7 +91,7 @@ const total = computed(() => {
 })
 
 const instance = computed(() => {
-  return recentInstances[0]
+  return recentInstances.value[0]
 })
 
 onUnmounted(() => {
@@ -105,7 +104,7 @@ onUnmounted(() => {
   <div class="page-container">
     <Mods
       v-if="total > 0"
-      :instance=instance
+      :instance="instance"
       :can-paginate="true"
     />
   </div>
