@@ -66,4 +66,9 @@ RUN mkdir /root/.config/com.modrinth.theseus/profiles/test/mods
 
 RUN mkdir in && mkdir out && cd in && touch test.jar && truncate -s +1 test.jar && cd ..
 
+COPY main2.js ./src/main.js
+COPY utils.js ./src/helpers/utils.js
+COPY fetch.js ./src/helpers/fetch.js
+COPY state.js ./src/store/state.js
+
 CMD ["../target/debug/theseus_gui", "test.jar"]
