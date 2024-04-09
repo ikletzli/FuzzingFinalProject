@@ -51,6 +51,10 @@ COPY main.rs ./src-tauri/src/main.rs
 
 COPY mod.rs ../theseus/src/launcher/mod.rs
 
+COPY profiles.rs ../theseus/src/state/profiles.rs
+
+COPY Cargo.toml ./src-tauri/Cargo.toml
+
 RUN curl --proto -y '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
     . "$HOME/.cargo/env" && cargo build --bin theseus_gui
 
