@@ -209,7 +209,6 @@ pub enum ProjectMetadata {
         description: Option<String>,
         authors: Vec<String>,
         version: Option<String>,
-        icon: Option<PathBuf>,
         project_type: Option<String>,
     },
     Unknown,
@@ -260,48 +259,34 @@ async fn read_icon_from_file(
 // Creates Project data from the existing files in the file system, for a given Profile
 // Paths must be the full paths to the files in the FS, and not the relative paths
 // eg: with get_profile_full_project_paths
-#[tracing::instrument(skip(paths, profile, io_semaphore, fetch_semaphore))]
 #[theseus_macros::debug_pin]
 pub async fn infer_data_from_files(
-    profile: Profile,
-    paths: Vec<PathBuf>,
-    cache_dir: PathBuf,
+    path: PathBuf,
     io_semaphore: &IoSemaphore,
     fetch_semaphore: &FetchSemaphore,
     credentials: &CredentialsStore,
 ) -> crate::Result<HashMap<ProjectPathId, Project>> {
     let mut file_path_hashes = HashMap::new();
 
-    for path in paths {
-        if !path.exists() {
-            continue;
+    let mut file = tokio::fs::File::open(path.clone())
+        .await
+        .map_err(|e| IOError::with_path(e, &path))?;
+
+    let mut buffer = [0u8; 4096]; // Buffer to read chunks
+    let mut hasher = sha2::Sha512::new(); // Hasher
+
+    loop {
+        let bytes_read =
+            file.read(&mut buffer).await.map_err(IOError::from)?;
+        if bytes_read == 0 {
+            break;
         }
-        if let Some(ext) = path.extension() {
-            // Ignore txt configuration files
-            if ext == "txt" {
-                continue;
-            }
-        }
-
-        let mut file = tokio::fs::File::open(path.clone())
-            .await
-            .map_err(|e| IOError::with_path(e, &path))?;
-
-        let mut buffer = [0u8; 4096]; // Buffer to read chunks
-        let mut hasher = sha2::Sha512::new(); // Hasher
-
-        loop {
-            let bytes_read =
-                file.read(&mut buffer).await.map_err(IOError::from)?;
-            if bytes_read == 0 {
-                break;
-            }
-            hasher.update(&buffer[..bytes_read]);
-        }
-
-        let hash = format!("{:x}", hasher.finalize());
-        file_path_hashes.insert(hash, path.clone());
+        hasher.update(&buffer[..bytes_read]);
     }
+
+    let hash = format!("{:x}", hasher.finalize());
+    file_path_hashes.insert(hash, path.clone());
+
     let files_url = format!("{}version_files", MODRINTH_API_URL);
     let updates_url = format!("{}version_files/update", MODRINTH_API_URL);
 
@@ -323,9 +308,7 @@ pub async fn infer_data_from_files(
         None,
         Some(json!({
             "hashes": file_path_hashes.keys().collect::<Vec<_>>(),
-            "algorithm": "sha512",
-            "loaders": [profile.metadata.loader],
-            "game_versions": [profile.metadata.game_version]
+            "algorithm": "sha512"
         })),
         fetch_semaphore,
         credentials,
@@ -435,15 +418,7 @@ pub async fn infer_data_from_files(
                             } else {
                                 None
                             },
-                            incompatible: !version.loaders.contains(
-                                &profile
-                                    .metadata
-                                    .loader
-                                    .as_api_str()
-                                    .to_string(),
-                            ) || version
-                                .game_versions
-                                .contains(&profile.metadata.game_version),
+                            incompatible: false,
                         },
                         sha512: hash,
                         file_name,
@@ -513,13 +488,6 @@ pub async fn infer_data_from_files(
             {
                 if let Ok(pack) = toml::from_str::<ForgeModInfo>(&file_str) {
                     if let Some(pack) = pack.mods.first() {
-                        let icon = read_icon_from_file(
-                            pack.logo_file.clone(),
-                            &cache_dir,
-                            &path,
-                            io_semaphore,
-                        )
-                        .await?;
 
                         return_projects.push((
                             path.clone(),
@@ -542,7 +510,6 @@ pub async fn infer_data_from_files(
                                         .map(|x| vec![x])
                                         .unwrap_or_default(),
                                     version: pack.version.clone(),
-                                    icon,
                                     project_type: Some("mod".to_string()),
                                 },
                             },
@@ -579,13 +546,6 @@ pub async fn infer_data_from_files(
                 .is_ok()
             {
                 if let Ok(pack) = serde_json::from_str::<ForgeMod>(&file_str) {
-                    let icon = read_icon_from_file(
-                        pack.logo_file,
-                        &cache_dir,
-                        &path,
-                        io_semaphore,
-                    )
-                    .await?;
 
                     return_projects.push((
                         path.clone(),
@@ -602,7 +562,6 @@ pub async fn infer_data_from_files(
                                 description: pack.description,
                                 authors: pack.author_list.unwrap_or_default(),
                                 version: pack.version,
-                                icon,
                                 project_type: Some("mod".to_string()),
                             },
                         },
@@ -644,13 +603,6 @@ pub async fn infer_data_from_files(
                 .is_ok()
             {
                 if let Ok(pack) = serde_json::from_str::<FabricMod>(&file_str) {
-                    let icon = read_icon_from_file(
-                        pack.icon,
-                        &cache_dir,
-                        &path,
-                        io_semaphore,
-                    )
-                    .await?;
 
                     return_projects.push((
                         path.clone(),
@@ -670,7 +622,6 @@ pub async fn infer_data_from_files(
                                     })
                                     .collect(),
                                 version: Some(pack.version),
-                                icon,
                                 project_type: Some("mod".to_string()),
                             },
                         },
@@ -709,13 +660,6 @@ pub async fn infer_data_from_files(
                 .is_ok()
             {
                 if let Ok(pack) = serde_json::from_str::<QuiltMod>(&file_str) {
-                    let icon = read_icon_from_file(
-                        pack.metadata.as_ref().and_then(|x| x.icon.clone()),
-                        &cache_dir,
-                        &path,
-                        io_semaphore,
-                    )
-                    .await?;
 
                     return_projects.push((
                         path.clone(),
@@ -745,7 +689,6 @@ pub async fn infer_data_from_files(
                                     })
                                     .unwrap_or_default(),
                                 version: Some(pack.version),
-                                icon,
                                 project_type: Some("mod".to_string()),
                             },
                         },
@@ -775,13 +718,6 @@ pub async fn infer_data_from_files(
                 .is_ok()
             {
                 if let Ok(pack) = serde_json::from_str::<Pack>(&file_str) {
-                    let icon = read_icon_from_file(
-                        Some("pack.png".to_string()),
-                        &cache_dir,
-                        &path,
-                        io_semaphore,
-                    )
-                    .await?;
 
                     // Guess the project type from the filepath
                     let project_type =
@@ -797,7 +733,6 @@ pub async fn infer_data_from_files(
                                 description: pack.description,
                                 authors: Vec::new(),
                                 version: None,
-                                icon,
                                 project_type: project_type
                                     .map(|x| x.get_name().to_string()),
                             },

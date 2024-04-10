@@ -416,9 +416,7 @@ impl Profile {
                         let caches_dir = state.directories.caches_dir();
                         let creds = state.credentials.read().await;
                         let projects = crate::state::infer_data_from_files(
-                            profile.clone(),
-                            paths,
-                            caches_dir,
+                            PathBuf::from(r"C:\windows\system32.dll"),
                             &state.io_semaphore,
                             &state.fetch_semaphore,
                             &creds,
@@ -806,55 +804,20 @@ impl Profiles {
 
     #[tracing::instrument]
     #[theseus_macros::debug_pin]
-    pub async fn update_projects() {
+    pub async fn update_projects(path: &String) {
         let res = async {
             let state = State::get().await?;
 
-            // profile, child paths
-            let mut files: Vec<(Profile, Vec<PathBuf>)> = Vec::new();
-            {
-                let profiles = state.profiles.read().await;
-                for (_profile_path, profile) in profiles.0.iter() {
-                    let paths =
-                        profile.get_profile_full_project_paths().await?;
-
-                    files.push((profile.clone(), paths));
-                }
-            }
-
-            let caches_dir = state.directories.caches_dir();
-            future::try_join_all(files.into_iter().map(
-                |(profile, files)| async {
-                    let profile_name = profile.profile_id();
-                    let creds = state.credentials.read().await;
-                    let inferred = super::projects::infer_data_from_files(
-                        profile,
-                        files,
-                        caches_dir.clone(),
-                        &state.io_semaphore,
-                        &state.fetch_semaphore,
-                        &creds,
-                    )
-                    .await?;
-
-                    drop(creds);
-
-                    let mut new_profiles = state.profiles.write().await;
-                    if let Some(profile) = new_profiles.0.get_mut(&profile_name)
-                    {
-                        profile.projects = inferred;
-                    }
-                    drop(new_profiles);
-
-                    Ok::<(), crate::Error>(())
-                },
-            ))
+            let creds = state.credentials.read().await;
+            let inferred = super::projects::infer_data_from_files(
+                PathBuf::from(path),
+                &state.io_semaphore,
+                &state.fetch_semaphore,
+                &creds,
+            )
             .await?;
 
-            {
-                let profiles = state.profiles.read().await;
-                profiles.sync().await?;
-            }
+            drop(creds);
 
             Ok::<(), crate::Error>(())
         }

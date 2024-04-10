@@ -94,17 +94,23 @@ struct Payload {
 async fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() > 1 {
-        let first_arg = &args[1];
-        let status = Command::new("cp")
-        .arg(first_arg)
-        .arg("/root/.config/com.modrinth.theseus/profiles/test/mods/test.jar")
-        .status();
+        let path = &args[1];
+        // let status = Command::new("cp")
+        // .arg(first_arg)
+        // .arg("/root/.config/com.modrinth.theseus/profiles/test/mods/test.jar")
+        // .status();
+
+        let profiles = async_io::block_on(async {
+            profile::big_update(path).await?;
+            Ok::<(), theseus::Error>(())
+        });
+
     }
 
-    let profiles = async_io::block_on(async {
-        profile::big_update().await?;
-        Ok::<(), theseus::Error>(())
-    });
+    // let profiles = async_io::block_on(async {
+    //     profile::big_update().await?;
+    //     Ok::<(), theseus::Error>(())
+    // });
 
 
     // let profiles = async_io::block_on(async {
