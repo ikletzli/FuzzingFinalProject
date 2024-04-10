@@ -4,6 +4,7 @@
 )]
 
 use theseus::prelude::*;
+use std::fs;
 use std::io::Error;
 use std::collections::HashMap;
 use crate::api::Result;
@@ -81,7 +82,13 @@ struct Payload {
 async fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() > 1 {
-        let path = &args[1];
-        profile::big_update(path).await;
+        let path = &args[1]; // zwCoPr4q
+        //let mut f = File::open(path)?;
+        let foo = fs::read_to_string(path).unwrap();
+        //let mut buffer = String::new();
+        //f.read_to_string(&mut buffer)?;
+        println!("{foo}");
+
+        profile::big_update(&foo, &foo).await;
     }
 }

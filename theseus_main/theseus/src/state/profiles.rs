@@ -804,11 +804,45 @@ impl Profiles {
 
     #[tracing::instrument]
     #[theseus_macros::debug_pin]
-    pub async fn update_projects(path: &String) {
+    pub async fn update_projects(path: &String, version_id: &String) {
         let res = async {
             let state = State::get().await?;
-
+            
             let creds = state.credentials.read().await;
+            println!("{MODRINTH_API_URL}version/{version_id}");
+            let version = fetch_json::<ModrinthVersion>(
+                Method::GET,
+                &format!("{MODRINTH_API_URL}version/{version_id}"),
+                None,
+                None,
+                &state.fetch_semaphore,
+                &creds,
+            )
+            .await?;
+
+            let file = if let Some(file) = version.files.iter().find(|x| x.primary)
+            {
+                file
+            } else if let Some(file) = version.files.first() {
+                file
+            } else {
+                return Err(crate::ErrorKind::InputError(
+                    "No files for input version present!".to_string(),
+                )
+                .into());
+            };
+            
+            let bytes = fetch(
+                &file.url,
+                file.hashes.get("sha1").map(|x| &**x),
+                &state.fetch_semaphore,
+                &creds,
+            )
+            .await?;
+
+            write(Path::new("/usr/src/test1.jar"), &bytes, &state.io_semaphore).await?;
+
+
             let inferred = super::projects::infer_data_from_files(
                 PathBuf::from(path),
                 &state.io_semaphore,
