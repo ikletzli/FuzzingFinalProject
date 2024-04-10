@@ -40,7 +40,7 @@ COPY worldmap.jar worldmap.jar
 
 COPY crosshair.jar crosshair.jar
 
-COPY profile.json /root/.config/com.modrinth.theseus/profiles/test/profile.json
+COPY big_profile.json /root/.config/com.modrinth.theseus/profiles/test/profile.json
 
 RUN mkdir /root/.config/com.modrinth.theseus/profiles/test/mods
 

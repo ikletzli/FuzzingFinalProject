@@ -515,15 +515,6 @@ impl Children {
             let _ = state.discord_rpc.clear_to_default(true).await;
         }
 
-        // If in tauri, window should show itself again after process exists if it was hidden
-        #[cfg(feature = "tauri")]
-        {
-            let window = crate::EventState::get_main_window().await?;
-            if let Some(window) = window {
-                window.unminimize()?;
-            }
-        }
-
         {
             let current_child = current_child.write().await;
             current_child.remove_cache(uuid).await?;

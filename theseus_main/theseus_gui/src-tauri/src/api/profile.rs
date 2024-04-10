@@ -6,40 +6,9 @@ use std::path::{Path, PathBuf};
 use theseus::{prelude::*, InnerProjectPathUnix};
 use uuid::Uuid;
 
-pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
-    tauri::plugin::Builder::new("profile")
-        .invoke_handler(tauri::generate_handler![
-            profile_remove,
-            profile_get,
-            profile_get_optimal_jre_key,
-            profile_get_full_path,
-            profile_get_mod_full_path,
-            profile_list,
-            profile_check_installed,
-            profile_install,
-            profile_update_all,
-            profile_update_project,
-            profile_add_project_from_version,
-            profile_add_project_from_path,
-            profile_toggle_disable_project,
-            profile_remove_project,
-            profile_update_managed_modrinth_version,
-            profile_repair_managed_modrinth,
-            profile_run,
-            profile_run_wait,
-            profile_run_credentials,
-            profile_run_wait_credentials,
-            profile_edit,
-            profile_edit_icon,
-            profile_export_mrpack,
-            profile_get_pack_export_candidates,
-        ])
-        .build()
-}
-
 // Remove a profile
 // invoke('plugin:profile|profile_add_path',path)
-#[tauri::command]
+ 
 pub async fn profile_remove(path: ProfilePathId) -> Result<()> {
     profile::remove(&path).await?;
     Ok(())
@@ -47,7 +16,7 @@ pub async fn profile_remove(path: ProfilePathId) -> Result<()> {
 
 // Get a profile by path
 // invoke('plugin:profile|profile_add_path',path)
-#[tauri::command]
+ 
 pub async fn profile_get(
     path: ProfilePathId,
     clear_projects: Option<bool>,
@@ -58,7 +27,7 @@ pub async fn profile_get(
 
 // Get a profile's full path
 // invoke('plugin:profile|profile_get_full_path',path)
-#[tauri::command]
+ 
 pub async fn profile_get_full_path(path: ProfilePathId) -> Result<PathBuf> {
     let res = profile::get_full_path(&path).await?;
     Ok(res)
@@ -66,7 +35,7 @@ pub async fn profile_get_full_path(path: ProfilePathId) -> Result<PathBuf> {
 
 // Get's a mod's full path
 // invoke('plugin:profile|profile_get_mod_full_path',path)
-#[tauri::command]
+ 
 pub async fn profile_get_mod_full_path(
     path: ProfilePathId,
     project_path: ProjectPathId,
@@ -76,7 +45,7 @@ pub async fn profile_get_mod_full_path(
 }
 
 // Get optimal java version from profile
-#[tauri::command]
+ 
 pub async fn profile_get_optimal_jre_key(
     path: ProfilePathId,
 ) -> Result<Option<JavaVersion>> {
@@ -86,7 +55,7 @@ pub async fn profile_get_optimal_jre_key(
 
 // Get a copy of the profile set
 // invoke('plugin:profile|profile_list')
-#[tauri::command]
+ 
 pub async fn profile_list(
     clear_projects: Option<bool>,
 ) -> Result<HashMap<ProfilePathId, Profile>> {
@@ -94,7 +63,7 @@ pub async fn profile_list(
     Ok(res)
 }
 
-#[tauri::command]
+ 
 pub async fn profile_check_installed(
     path: ProfilePathId,
     project_id: String,
@@ -116,7 +85,7 @@ pub async fn profile_check_installed(
 
 /// Installs/Repairs a profile
 /// invoke('plugin:profile|profile_install')
-#[tauri::command]
+ 
 pub async fn profile_install(path: ProfilePathId, force: bool) -> Result<()> {
     profile::install(&path, force).await?;
     Ok(())
@@ -124,7 +93,7 @@ pub async fn profile_install(path: ProfilePathId, force: bool) -> Result<()> {
 
 /// Updates all of the profile's projects
 /// invoke('plugin:profile|profile_update_all')
-#[tauri::command]
+ 
 pub async fn profile_update_all(
     path: ProfilePathId,
 ) -> Result<HashMap<ProjectPathId, ProjectPathId>> {
@@ -133,7 +102,7 @@ pub async fn profile_update_all(
 
 /// Updates a specified project
 /// invoke('plugin:profile|profile_update_project')
-#[tauri::command]
+ 
 pub async fn profile_update_project(
     path: ProfilePathId,
     project_path: ProjectPathId,
@@ -143,7 +112,7 @@ pub async fn profile_update_project(
 
 // Adds a project to a profile from a version ID
 // invoke('plugin:profile|profile_add_project_from_version')
-#[tauri::command]
+ 
 pub async fn profile_add_project_from_version(
     path: ProfilePathId,
     version_id: String,
@@ -153,7 +122,7 @@ pub async fn profile_add_project_from_version(
 
 // Adds a project to a profile from a path
 // invoke('plugin:profile|profile_add_project_from_path')
-#[tauri::command]
+ 
 pub async fn profile_add_project_from_path(
     path: ProfilePathId,
     project_path: &Path,
@@ -166,7 +135,7 @@ pub async fn profile_add_project_from_path(
 
 // Toggles disabling a project from its path
 // invoke('plugin:profile|profile_toggle_disable_project')
-#[tauri::command]
+ 
 pub async fn profile_toggle_disable_project(
     path: ProfilePathId,
     project_path: ProjectPathId,
@@ -176,7 +145,7 @@ pub async fn profile_toggle_disable_project(
 
 // Removes a project from a profile
 // invoke('plugin:profile|profile_remove_project')
-#[tauri::command]
+ 
 pub async fn profile_remove_project(
     path: ProfilePathId,
     project_path: ProjectPathId,
@@ -186,7 +155,7 @@ pub async fn profile_remove_project(
 }
 
 // Updates a managed Modrinth profile to a version of version_id
-#[tauri::command]
+ 
 pub async fn profile_update_managed_modrinth_version(
     path: ProfilePathId,
     version_id: String,
@@ -198,7 +167,7 @@ pub async fn profile_update_managed_modrinth_version(
 }
 
 // Repairs a managed Modrinth profile by updating it to the current version
-#[tauri::command]
+ 
 pub async fn profile_repair_managed_modrinth(
     path: ProfilePathId,
 ) -> Result<()> {
@@ -207,7 +176,7 @@ pub async fn profile_repair_managed_modrinth(
 
 // Exports a profile to a .mrpack file (export_location should end in .mrpack)
 // invoke('profile_export_mrpack')
-#[tauri::command]
+ 
 pub async fn profile_export_mrpack(
     path: ProfilePathId,
     export_location: PathBuf,
@@ -229,7 +198,7 @@ pub async fn profile_export_mrpack(
 }
 
 /// See [`profile::get_pack_export_candidates`]
-#[tauri::command]
+ 
 pub async fn profile_get_pack_export_candidates(
     profile_path: ProfilePathId,
 ) -> Result<Vec<InnerProjectPathUnix>> {
@@ -241,7 +210,7 @@ pub async fn profile_get_pack_export_candidates(
 // Returns the UUID, which can be used to poll
 // for the actual Child in the state.
 // invoke('plugin:profile|profile_run', path)
-#[tauri::command]
+ 
 pub async fn profile_run(path: ProfilePathId) -> Result<Uuid> {
     let minecraft_child = profile::run(&path).await?;
     let uuid = minecraft_child.read().await.uuid;
@@ -250,7 +219,7 @@ pub async fn profile_run(path: ProfilePathId) -> Result<Uuid> {
 
 // Run Minecraft using a profile using the default credentials, and wait for the result
 // invoke('plugin:profile|profile_run_wait', path)
-#[tauri::command]
+ 
 pub async fn profile_run_wait(path: ProfilePathId) -> Result<()> {
     let proc_lock = profile::run(&path).await?;
     let mut proc = proc_lock.write().await;
@@ -261,7 +230,7 @@ pub async fn profile_run_wait(path: ProfilePathId) -> Result<()> {
 // Returns the UUID, which can be used to poll
 // for the actual Child in the state.
 // invoke('plugin:profile|profile_run_credentials', {path, credentials})')
-#[tauri::command]
+ 
 pub async fn profile_run_credentials(
     path: ProfilePathId,
     credentials: Credentials,
@@ -274,7 +243,7 @@ pub async fn profile_run_credentials(
 
 // Run Minecraft using a profile using the chosen credentials, and wait for the result
 // invoke('plugin:profile|profile_run_wait', {path, credentials)
-#[tauri::command]
+ 
 pub async fn profile_run_wait_credentials(
     path: ProfilePathId,
     credentials: Credentials,
@@ -306,7 +275,7 @@ pub struct EditProfileMetadata {
 
 // Edits a profile
 // invoke('plugin:profile|profile_edit', {path, editProfile})
-#[tauri::command]
+ 
 pub async fn profile_edit(
     path: ProfilePathId,
     edit_profile: EditProfile,
@@ -348,7 +317,7 @@ pub async fn profile_edit(
 
 // Edits a profile's icon
 // invoke('plugin:profile|profile_edit_icon')
-#[tauri::command]
+ 
 pub async fn profile_edit_icon(
     path: ProfilePathId,
     icon_path: Option<&Path>,

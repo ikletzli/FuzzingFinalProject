@@ -15,26 +15,10 @@ pub mod emit;
 static EVENT_STATE: OnceCell<Arc<EventState>> = OnceCell::const_new();
 pub struct EventState {
     /// Tauri app
-    #[cfg(feature = "tauri")]
-    pub app: tauri::AppHandle,
     pub loading_bars: RwLock<HashMap<Uuid, LoadingBar>>,
 }
 
 impl EventState {
-    #[cfg(feature = "tauri")]
-    pub async fn init(app: tauri::AppHandle) -> crate::Result<Arc<Self>> {
-        EVENT_STATE
-            .get_or_try_init(|| async {
-                Ok(Arc::new(Self {
-                    app,
-                    loading_bars: RwLock::new(HashMap::new()),
-                }))
-            })
-            .await
-            .cloned()
-    }
-
-    #[cfg(not(feature = "tauri"))]
     pub async fn init() -> crate::Result<Arc<Self>> {
         EVENT_STATE
             .get_or_try_init(|| async {
@@ -46,13 +30,7 @@ impl EventState {
             .map(Arc::clone)
     }
 
-    #[cfg(feature = "tauri")]
-    pub async fn get() -> crate::Result<Arc<Self>> {
-        Ok(EVENT_STATE.get().ok_or(EventError::NotInitialized)?.clone())
-    }
-
     // Initialization requires no app handle in non-tauri mode, so we can just use the same function
-    #[cfg(not(feature = "tauri"))]
     pub async fn get() -> crate::Result<Arc<Self>> {
         Self::init().await
     }
@@ -69,13 +47,6 @@ impl EventState {
         }
 
         Ok(display_list)
-    }
-
-    #[cfg(feature = "tauri")]
-    pub async fn get_main_window() -> crate::Result<Option<tauri::Window>> {
-        use tauri::Manager;
-        let value = Self::get().await?;
-        Ok(value.app.get_window("main"))
     }
 }
 
@@ -104,40 +75,6 @@ impl Drop for LoadingBarId {
         tokio::spawn(async move {
             if let Ok(event_state) = EventState::get().await {
                 let mut bars = event_state.loading_bars.write().await;
-
-                #[cfg(any(feature = "tauri", feature = "cli"))]
-                if let Some(bar) = bars.remove(&loader_uuid) {
-                    #[cfg(feature = "tauri")]
-                    {
-                        let loader_uuid = bar.loading_bar_uuid;
-                        let event = bar.bar_type.clone();
-                        let fraction = bar.current / bar.total;
-
-                        use tauri::Manager;
-                        let _ = event_state.app.emit_all(
-                            "loading",
-                            LoadingPayload {
-                                fraction: None,
-                                message: "Completed".to_string(),
-                                event,
-                                loader_uuid,
-                            },
-                        );
-                        tracing::trace!(
-                            "Exited at {fraction} for loading bar: {:?}",
-                            loader_uuid
-                        );
-                    }
-
-                    // Emit event to indicatif progress bar arc
-                    #[cfg(feature = "cli")]
-                    {
-                        let cli_progress_bar = bar.cli_progress_bar;
-                        cli_progress_bar.finish();
-                    }
-                }
-
-                #[cfg(not(any(feature = "tauri", feature = "cli")))]
                 bars.remove(&loader_uuid);
             }
             // complete calls state, and since a  LoadingBarId is created in state initialization, we only complete if its already initializaed
@@ -271,8 +208,4 @@ pub enum EventError {
 
     #[error("Non-existent loading bar of key: {0}")]
     NoLoadingBar(Uuid),
-
-    #[cfg(feature = "tauri")]
-    #[error("Tauri error: {0}")]
-    TauriError(#[from] tauri::Error),
 }

@@ -1,10 +1,10 @@
 // IO error
 // A wrapper around the tokio IO functions that adds the path to the error message, instead of the uninformative std::io::Error.
 
-use std::{io::Write, path::Path};
+use std::{path::Path, io::Write};
 
 use tempfile::NamedTempFile;
-use tokio::task::spawn_blocking;
+//use tauri::async_runtime::spawn_blocking;
 
 #[derive(Debug, thiserror::Error)]
 pub enum IOError {
@@ -118,17 +118,17 @@ pub async fn write(
 ) -> Result<(), IOError> {
     let path = path.as_ref().to_owned();
     let data = data.as_ref().to_owned();
-    spawn_blocking(move || {
-        let cloned_path = path.clone();
-        sync_write(data, path).map_err(|e| IOError::IOPathError {
-            source: e,
-            path: cloned_path.to_string_lossy().to_string(),
-        })
-    })
-    .await
-    .map_err(|_| {
-        std::io::Error::new(std::io::ErrorKind::Other, "background task failed")
-    })??;
+    // spawn_blocking(move || {
+    //     let cloned_path = path.clone();
+    //     sync_write(data, path).map_err(|e| IOError::IOPathError {
+    //         source: e,
+    //         path: cloned_path.to_string_lossy().to_string(),
+    //     })
+    // })
+    // .await
+    // .map_err(|_| {
+    //     std::io::Error::new(std::io::ErrorKind::Other, "background task failed")
+    // })??;
 
     Ok(())
 }
@@ -137,13 +137,12 @@ fn sync_write(
     data: impl AsRef<[u8]>,
     path: impl AsRef<Path>,
 ) -> Result<(), std::io::Error> {
-    let mut tempfile =
-        NamedTempFile::new_in(path.as_ref().parent().ok_or_else(|| {
-            std::io::Error::new(
-                std::io::ErrorKind::Other,
-                "could not get parent directory for temporary file",
-            )
-        })?)?;
+    let mut tempfile = NamedTempFile::new_in(path.as_ref().parent().ok_or_else(|| {
+        std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "could not get parent directory for temporary file",
+        )
+    })?)?;
     tempfile.write_all(data.as_ref())?;
     let tmp_path = tempfile.into_temp_path();
     let path = path.as_ref();

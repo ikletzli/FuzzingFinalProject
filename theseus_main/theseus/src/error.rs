@@ -99,10 +99,6 @@ pub enum ErrorKind {
 
     #[error("Error: {0}")]
     OtherError(String),
-
-    #[cfg(feature = "tauri")]
-    #[error("Tauri error: {0}")]
-    TauriError(#[from] tauri::Error),
 }
 
 #[derive(Debug)]

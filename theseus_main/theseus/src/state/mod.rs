@@ -82,8 +82,6 @@ pub struct State {
     pub children: RwLock<Children>,
     /// Launcher profile metadata
     pub(crate) profiles: RwLock<Profiles>,
-    /// Launcher tags
-    pub(crate) tags: RwLock<Tags>,
     /// Launcher processes that should be safely exited on shutdown
     pub(crate) safety_processes: RwLock<SafeProcesses>,
     /// Launcher user account info
@@ -165,27 +163,22 @@ impl State {
         let metadata_fut =
             Metadata::init(&directories, !is_offline, &io_semaphore);
         let profiles_fut = Profiles::init(&directories, &mut file_watcher);
-        let tags_fut = Tags::init(
-            &directories,
-            !is_offline,
-            &io_semaphore,
-            &fetch_semaphore,
-            &CredentialsStore(None),
-        );
         let users_fut = Users::init(&directories, &io_semaphore);
         let creds_fut = CredentialsStore::init(&directories, &io_semaphore);
         // Launcher data
-        let (metadata, profiles, tags, users, creds) = loading_join! {
+        println!("lol2");
+        let (metadata, profiles, creds, users) = loading_join! {
             Some(&loading_bar), 70.0, Some("Loading metadata");
             metadata_fut,
             profiles_fut,
-            tags_fut,
-            users_fut,
             creds_fut,
+            users_fut
         }?;
+        println!("lol3");
 
         let auth_flow = AuthTask::new();
         let safety_processes = SafeProcesses::new();
+        println!("lol4");
 
         let discord_rpc = DiscordGuard::init(is_offline).await?;
         if !settings.disable_discord_rpc && !is_offline {
@@ -195,11 +188,14 @@ impl State {
         }
 
         let children = Children::new();
+        println!("lol5");
 
         // Starts a loop of checking if we are online, and updating
         Self::offine_check_loop();
+        println!("lol6");
 
         emit_loading(&loading_bar, 10.0, None).await?;
+        println!("lol7");
 
         Ok::<RwLock<Self>, crate::Error>(RwLock::new(Self {
             offline: RwLock::new(is_offline),
@@ -219,7 +215,6 @@ impl State {
             children: RwLock::new(children),
             auth_flow: RwLock::new(auth_flow),
             credentials: RwLock::new(creds),
-            tags: RwLock::new(tags),
             discord_rpc,
             safety_processes: RwLock::new(safety_processes),
             file_watcher: RwLock::new(file_watcher),
@@ -248,14 +243,13 @@ impl State {
             if let Ok(state) = crate::State::get().await {
                 if !*state.offline.read().await {
                     let res1 = Profiles::update_modrinth_versions();
-                    let res2 = Tags::update();
                     let res3 = Metadata::update();
                     let res4 = Profiles::update_projects();
                     let res5 = Settings::update_java();
                     let res6 = CredentialsStore::update_creds();
                     let res7 = Settings::update_default_user();
 
-                    let _ = join!(res1, res2, res3, res4, res5, res6, res7);
+                    let _ = join!(res1, res3, res4, res5, res6, res7);
                 }
             }
         });

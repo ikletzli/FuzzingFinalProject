@@ -50,7 +50,7 @@ pub enum ProfileInstallStage {
 /// eg: for "a/b/c/profiles/My Mod", the ProfilePathId would be "My Mod" (a relative path)
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
 #[serde(transparent)]
-pub struct ProfilePathId(PathBuf);
+pub struct ProfilePathId(pub PathBuf);
 
 impl ProfilePathId {
     // Create a new ProfilePathId from a full file path

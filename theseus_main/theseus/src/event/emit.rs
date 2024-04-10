@@ -9,12 +9,6 @@ use crate::{
 };
 use futures::prelude::*;
 
-#[cfg(feature = "tauri")]
-use crate::event::{
-    LoadingPayload, ProcessPayload, ProfilePayload, WarningPayload,
-};
-#[cfg(feature = "tauri")]
-use tauri::Manager;
 use uuid::Uuid;
 
 #[cfg(feature = "cli")]
@@ -189,23 +183,6 @@ pub async fn emit_loading(
             );
         }
 
-        //Emit event to tauri
-        #[cfg(feature = "tauri")]
-        event_state
-            .app
-            .emit_all(
-                "loading",
-                LoadingPayload {
-                    fraction: opt_display_frac,
-                    message: message
-                        .unwrap_or(&loading_bar.message)
-                        .to_string(),
-                    event: loading_bar.bar_type.clone(),
-                    loader_uuid: loading_bar.loading_bar_uuid,
-                },
-            )
-            .map_err(EventError::from)?;
-
         loading_bar.last_sent = display_frac;
     }
 
@@ -216,19 +193,6 @@ pub async fn emit_loading(
 #[allow(dead_code)]
 #[allow(unused_variables)]
 pub async fn emit_warning(message: &str) -> crate::Result<()> {
-    #[cfg(feature = "tauri")]
-    {
-        let event_state = crate::EventState::get().await?;
-        event_state
-            .app
-            .emit_all(
-                "warning",
-                WarningPayload {
-                    message: message.to_string(),
-                },
-            )
-            .map_err(EventError::from)?;
-    }
     tracing::warn!("{}", message);
     Ok(())
 }
@@ -238,14 +202,6 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
 #[allow(dead_code)]
 #[allow(unused_variables)]
 pub async fn emit_offline(offline: bool) -> crate::Result<()> {
-    #[cfg(feature = "tauri")]
-    {
-        let event_state = crate::EventState::get().await?;
-        event_state
-            .app
-            .emit_all("offline", offline)
-            .map_err(EventError::from)?;
-    }
     Ok(())
 }
 
@@ -256,14 +212,6 @@ pub async fn emit_offline(offline: bool) -> crate::Result<()> {
 #[allow(unused_variables)]
 pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
     tracing::debug!("Command: {}", serde_json::to_string(&command)?);
-    #[cfg(feature = "tauri")]
-    {
-        let event_state = crate::EventState::get().await?;
-        event_state
-            .app
-            .emit_all("command", command)
-            .map_err(EventError::from)?;
-    }
     Ok(())
 }
 
@@ -275,22 +223,6 @@ pub async fn emit_process(
     event: ProcessPayloadType,
     message: &str,
 ) -> crate::Result<()> {
-    #[cfg(feature = "tauri")]
-    {
-        let event_state = crate::EventState::get().await?;
-        event_state
-            .app
-            .emit_all(
-                "process",
-                ProcessPayload {
-                    uuid,
-                    pid,
-                    event,
-                    message: message.to_string(),
-                },
-            )
-            .map_err(EventError::from)?;
-    }
     Ok(())
 }
 
@@ -302,24 +234,6 @@ pub async fn emit_profile(
     name: &str,
     event: ProfilePayloadType,
 ) -> crate::Result<()> {
-    #[cfg(feature = "tauri")]
-    {
-        let path = profile_path_id.get_full_path().await?;
-        let event_state = crate::EventState::get().await?;
-        event_state
-            .app
-            .emit_all(
-                "profile",
-                ProfilePayload {
-                    uuid,
-                    profile_path_id: profile_path_id.clone(),
-                    path,
-                    name: name.to_string(),
-                    event,
-                },
-            )
-            .map_err(EventError::from)?;
-    }
     Ok(())
 }
 

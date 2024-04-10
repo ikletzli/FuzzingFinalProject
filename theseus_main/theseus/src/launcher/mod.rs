@@ -216,34 +216,34 @@ pub async fn install_minecraft(
     )
     .await?;
 
-    let java_version = get_java_version_from_profile(profile, &version_info)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::OtherError(
-                "Missing correct java installation".to_string(),
-            )
-        })?;
+    // let java_version = get_java_version_from_profile(profile, &version_info)
+    //     .await?
+    //     .ok_or_else(|| {
+    //         crate::ErrorKind::OtherError(
+    //             "Missing correct java installation".to_string(),
+    //         )
+    //     })?;
 
-    // Test jre version
-    let java_version = jre::check_jre(java_version.path.clone().into())
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::LauncherError(format!(
-                "Java path invalid or non-functional: {}",
-                java_version.path
-            ))
-        })?;
+    // // Test jre version
+    // let java_version = jre::check_jre(java_version.path.clone().into())
+    //     .await?
+    //     .ok_or_else(|| {
+    //         crate::ErrorKind::LauncherError(format!(
+    //             "Java path invalid or non-functional: {}",
+    //             java_version.path
+    //         ))
+    //     })?;
 
-    // Download minecraft (5-90)
-    download::download_minecraft(
-        &state,
-        &version_info,
-        &loading_bar,
-        &java_version.architecture,
-        repairing,
-        minecraft_updated,
-    )
-    .await?;
+    // // Download minecraft (5-90)
+    // download::download_minecraft(
+    //     &state,
+    //     &version_info,
+    //     &loading_bar,
+    //     &java_version.architecture,
+    //     repairing,
+    //     minecraft_updated,
+    // )
+    // .await?;
 
     if let Some(processors) = &version_info.processors {
         let client_path = state
@@ -290,48 +290,48 @@ pub async fn install_minecraft(
                     cp.push(processor.jar.clone())
                 });
 
-                let child = Command::new(&java_version.path)
-                    .arg("-cp")
-                    .arg(args::get_class_paths_jar(
-                        &libraries_dir,
-                        &cp,
-                        &java_version.architecture,
-                    )?)
-                    .arg(
-                        args::get_processor_main_class(args::get_lib_path(
-                            &libraries_dir,
-                            &processor.jar,
-                            false,
-                        )?)
-                        .await?
-                        .ok_or_else(|| {
-                            crate::ErrorKind::LauncherError(format!(
-                                "Could not find processor main class for {}",
-                                processor.jar
-                            ))
-                        })?,
-                    )
-                    .args(args::get_processor_arguments(
-                        &libraries_dir,
-                        &processor.args,
-                        data,
-                    )?)
-                    .output()
-                    .await
-                    .map_err(|e| IOError::with_path(e, &java_version.path))
-                    .map_err(|err| {
-                        crate::ErrorKind::LauncherError(format!(
-                            "Error running processor: {err}",
-                        ))
-                    })?;
+                // let child = Command::new(&java_version.path)
+                //     .arg("-cp")
+                //     .arg(args::get_class_paths_jar(
+                //         &libraries_dir,
+                //         &cp,
+                //         &java_version.architecture,
+                //     )?)
+                //     .arg(
+                //         args::get_processor_main_class(args::get_lib_path(
+                //             &libraries_dir,
+                //             &processor.jar,
+                //             false,
+                //         )?)
+                //         .await?
+                //         .ok_or_else(|| {
+                //             crate::ErrorKind::LauncherError(format!(
+                //                 "Could not find processor main class for {}",
+                //                 processor.jar
+                //             ))
+                //         })?,
+                //     )
+                //     .args(args::get_processor_arguments(
+                //         &libraries_dir,
+                //         &processor.args,
+                //         data,
+                //     )?)
+                //     .output()
+                //     .await
+                //     .map_err(|e| IOError::with_path(e, &java_version.path))
+                //     .map_err(|err| {
+                //         crate::ErrorKind::LauncherError(format!(
+                //             "Error running processor: {err}",
+                //         ))
+                //     })?;
 
-                if !child.status.success() {
-                    return Err(crate::ErrorKind::LauncherError(format!(
-                        "Processor error: {}",
-                        String::from_utf8_lossy(&child.stderr)
-                    ))
-                    .as_error());
-                }
+                // if !child.status.success() {
+                //     return Err(crate::ErrorKind::LauncherError(format!(
+                //         "Processor error: {}",
+                //         String::from_utf8_lossy(&child.stderr)
+                //     ))
+                //     .as_error());
+                // }
 
                 emit_loading(
                     &loading_bar,
@@ -427,22 +427,22 @@ pub async fn launch_minecraft(
     .await?;
 
     let java_version = get_java_version_from_profile(profile, &version_info)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::LauncherError(
-                "Missing correct java installation".to_string(),
-            )
+    .await?
+    .ok_or_else(|| {
+    crate::ErrorKind::LauncherError(
+    "Missing correct java installation".to_string(),
+    )
         })?;
 
     // Test jre version
     let java_version = jre::check_jre(java_version.path.clone().into())
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::LauncherError(format!(
-                "Java path invalid or non-functional: {}",
-                java_version.path
-            ))
-        })?;
+    .await?
+    .ok_or_else(|| {
+    crate::ErrorKind::LauncherError(format!(
+    "Java path invalid or non-functional: {}",
+    java_version.path
+    ))
+    })?;
 
     let client_path = state
         .directories
@@ -452,9 +452,9 @@ pub async fn launch_minecraft(
 
     let args = version_info.arguments.clone().unwrap_or_default();
     let mut command = match wrapper {
-        Some(hook) => {
-            wrap_ref_builder!(it = Command::new(hook) => {it.arg(&java_version.path)})
-        }
+    Some(hook) => {
+    wrap_ref_builder!(it = Command::new(hook) => {it.arg(&java_version.path)})
+    }
         None => Command::new(&java_version.path),
     };
 
@@ -472,51 +472,51 @@ pub async fn launch_minecraft(
         .as_error());
     }
     command
-        .args(
-            args::get_jvm_arguments(
-                args.get(&d::minecraft::ArgumentType::Jvm)
-                    .map(|x| x.as_slice()),
-                &state.directories.version_natives_dir(&version_jar).await,
-                &state.directories.libraries_dir().await,
-                &args::get_class_paths(
-                    &state.directories.libraries_dir().await,
-                    version_info.libraries.as_slice(),
-                    &client_path,
-                    &java_version.architecture,
-                    minecraft_updated,
-                )?,
-                &version_jar,
-                *memory,
-                Vec::from(java_args),
-                &java_version.architecture,
-            )?
-            .into_iter()
-            .collect::<Vec<_>>(),
-        )
+    .args(
+    args::get_jvm_arguments(
+    args.get(&d::minecraft::ArgumentType::Jvm)
+    .map(|x| x.as_slice()),
+    &state.directories.version_natives_dir(&version_jar).await,
+    &state.directories.libraries_dir().await,
+    &args::get_class_paths(
+    &state.directories.libraries_dir().await,
+    version_info.libraries.as_slice(),
+    &client_path,
+    &java_version.architecture,
+    minecraft_updated,
+    )?,
+    &version_jar,
+    *memory,
+    Vec::from(java_args),
+    &java_version.architecture,
+    )?
+    .into_iter()
+    .collect::<Vec<_>>(),
+    )
         .arg(version_info.main_class.clone())
-        .args(
-            args::get_minecraft_arguments(
-                args.get(&d::minecraft::ArgumentType::Game)
-                    .map(|x| x.as_slice()),
-                version_info.minecraft_arguments.as_deref(),
-                credentials,
-                &version.id,
-                &version_info.asset_index.id,
-                instance_path,
-                &state.directories.assets_dir().await,
-                &version.type_,
-                *resolution,
-                &java_version.architecture,
-            )?
-            .into_iter()
-            .collect::<Vec<_>>(),
-        )
+    .args(
+    args::get_minecraft_arguments(
+    args.get(&d::minecraft::ArgumentType::Game)
+    .map(|x| x.as_slice()),
+    version_info.minecraft_arguments.as_deref(),
+    credentials,
+    &version.id,
+    &version_info.asset_index.id,
+    instance_path,
+    &state.directories.assets_dir().await,
+    &version.type_,
+    *resolution,
+    &java_version.architecture,
+    )?
+    .into_iter()
+    .collect::<Vec<_>>(),
+    )
         .current_dir(instance_path.clone());
 
     // CARGO-set DYLD_LIBRARY_PATH breaks Minecraft on macOS during testing on playground
     #[cfg(target_os = "macos")]
     if std::env::var("CARGO").is_ok() {
-        command.env_remove("DYLD_FALLBACK_LIBRARY_PATH");
+    command.env_remove("DYLD_FALLBACK_LIBRARY_PATH");
     }
     // Java options should be set in instance options (the existence of _JAVA_OPTIONS overwites them)
     command.env_remove("_JAVA_OPTIONS");
@@ -585,20 +585,6 @@ pub async fn launch_minecraft(
         "{MINECRAFT_UUID}".to_string(),
     );
 
-    // If in tauri, and the 'minimize on launch' setting is enabled, minimize the window
-    #[cfg(feature = "tauri")]
-    {
-        use crate::EventState;
-
-        let window = EventState::get_main_window().await?;
-        if let Some(window) = window {
-            let settings = state.settings.read().await;
-            if settings.hide_on_process {
-                window.minimize()?;
-            }
-        }
-    }
-
     if !*state.offline.read().await {
         // Add game played to discord rich presence
         let _ = state
@@ -611,12 +597,12 @@ pub async fn launch_minecraft(
     // This also spawns the process and prepares the subsequent processes
     let mut state_children = state.children.write().await;
     state_children
-        .insert_new_process(
-            Uuid::new_v4(),
-            profile.profile_id(),
-            command,
-            post_exit_hook,
-            censor_strings,
-        )
+    .insert_new_process(
+    Uuid::new_v4(),
+    profile.profile_id(),
+    command,
+    post_exit_hook,
+    censor_strings,
+    )
         .await
 }

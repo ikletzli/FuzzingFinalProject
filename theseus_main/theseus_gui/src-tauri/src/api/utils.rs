@@ -8,25 +8,8 @@ use theseus::{
 use crate::api::Result;
 use std::{env, path::PathBuf, process::Command};
 
-pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
-    tauri::plugin::Builder::new("utils")
-        .invoke_handler(tauri::generate_handler![
-            get_os,
-            should_disable_mouseover,
-            show_in_folder,
-            show_launcher_logs_folder,
-            progress_bars_list,
-            safety_check_safe_loading_bars,
-            get_opening_command,
-            await_sync,
-            is_offline,
-            refresh_offline
-        ])
-        .build()
-}
-
 /// Gets OS
-#[tauri::command]
+ 
 pub fn get_os() -> OS {
     #[cfg(target_os = "windows")]
     let os = OS::Windows;
@@ -46,7 +29,7 @@ pub enum OS {
 // Lists active progress bars
 // Create a new HashMap with the same keys
 // Values provided should not be used directly, as they are not guaranteed to be up-to-date
-#[tauri::command]
+ 
 pub async fn progress_bars_list(
 ) -> Result<std::collections::HashMap<uuid::Uuid, theseus::LoadingBar>> {
     let res = theseus::EventState::list_progress_bars().await?;
@@ -54,7 +37,7 @@ pub async fn progress_bars_list(
 }
 
 // Check if there are any safe loading bars running
-#[tauri::command]
+ 
 pub async fn safety_check_safe_loading_bars() -> Result<bool> {
     Ok(theseus::safety::check_safe_loading_bars().await?)
 }
@@ -62,7 +45,7 @@ pub async fn safety_check_safe_loading_bars() -> Result<bool> {
 // cfg only on mac os
 // disables mouseover and fixes a random crash error only fixed by recent versions of macos
 #[cfg(target_os = "macos")]
-#[tauri::command]
+ 
 pub async fn should_disable_mouseover() -> bool {
     // We try to match version to 12.2 or higher. If unrecognizable to pattern or lower, we default to the css with disabled mouseover for safety
     let os = os_info::get();
@@ -75,12 +58,12 @@ pub async fn should_disable_mouseover() -> bool {
     true
 }
 #[cfg(not(target_os = "macos"))]
-#[tauri::command]
+ 
 pub async fn should_disable_mouseover() -> bool {
     false
 }
 
-#[tauri::command]
+ 
 pub fn show_in_folder(path: PathBuf) -> Result<()> {
     {
         #[cfg(target_os = "windows")]
@@ -134,7 +117,7 @@ pub fn show_in_folder(path: PathBuf) -> Result<()> {
     Ok(())
 }
 
-#[tauri::command]
+ 
 pub fn show_launcher_logs_folder() -> Result<()> {
     let path = DirectoryInfo::launcher_logs_dir().unwrap_or_default();
     // failure to get folder just opens filesystem
@@ -146,7 +129,7 @@ pub fn show_launcher_logs_folder() -> Result<()> {
 // For example, if a user clicks on an .mrpack to open the app.
 // This should be called once and only when the app is done booting up and ready to receive a command
 // Returns a Command struct- see events.js
-#[tauri::command]
+ 
 pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
     // Tauri is not CLI, we use arguments as path to file to call
     let cmd_arg = env::args_os().nth(1);
@@ -166,7 +149,7 @@ pub async fn handle_command(command: String) -> Result<()> {
 }
 
 // Waits for state to be synced
-#[tauri::command]
+ 
 pub async fn await_sync() -> Result<()> {
     State::sync().await?;
     tracing::debug!("State synced");
@@ -174,7 +157,7 @@ pub async fn await_sync() -> Result<()> {
 }
 
 /// Check if theseus is currently in offline mode, without a refresh attempt
-#[tauri::command]
+ 
 pub async fn is_offline() -> Result<bool> {
     let state = State::get().await?;
     let offline = *state.offline.read().await;
@@ -182,7 +165,6 @@ pub async fn is_offline() -> Result<bool> {
 }
 
 /// Refreshes whether or not theseus is in offline mode, and returns the new value
-#[tauri::command]
 pub async fn refresh_offline() -> Result<bool> {
     let state = State::get().await?;
     state.refresh_offline().await?;

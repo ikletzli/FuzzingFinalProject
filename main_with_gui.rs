@@ -16,7 +16,7 @@ mod macos;
 
 // Should be called in launcher initialization
 #[tracing::instrument(skip_all)]
-#[tauri::command]
+ 
 async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     theseus::EventState::init(app).await?;
     let s = State::get().await?;
@@ -26,13 +26,13 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     Ok(())
 }
 
-#[tauri::command]
+ 
 fn is_dev() -> bool {
     cfg!(debug_assertions)
 }
 
 // Toggles decorations
-#[tauri::command]
+ 
 async fn toggle_decorations(b: bool, window: tauri::Window) -> api::Result<()> {
     window.set_decorations(b).map_err(|e| {
         theseus::Error::from(theseus::ErrorKind::OtherError(format!(
