@@ -2,16 +2,6 @@ FROM node:16 AS builder
 
 WORKDIR /usr/src
 
-RUN git clone https://github.com/modrinth/theseus.git
-
-WORKDIR /usr/src/theseus/theseus_gui
-
-RUN npm install && \
-    npm install -g jest && \
-    npm install -g @vue/cli && \
-    npm audit fix --force && \
-    npm install @vue/cli-plugin-unit-jest @vue/test-utils
-
 RUN apt update && apt -y install libsoup2.4-dev && apt -y install libpango1.0-dev && \
 apt -y install libatk1.0-dev && apt -y install javascriptcoregtk-4.0 && apt -y install gdk-3.0
 
@@ -27,33 +17,19 @@ RUN apt-get update && \
 RUN git clone https://github.com/AFLplusplus/AFLplusplus && \
     cd AFLplusplus && make distrib && make install
 
-RUN mkdir __tests__
+RUN mkdir theseus
 
-COPY package.json ./package.json
+COPY theseus_main ./theseus
 
-COPY search.spec.js __tests__/search.spec.js
+WORKDIR /usr/src/theseus/theseus_gui
 
-COPY browse_test.js ./src/browse_test.js
-
-COPY App2.vue ./src/App.vue
-
-COPY RowDisplay.vue ./src/components/RowDisplay.vue
-
-COPY Index.vue ./src/pages/Index.vue
-
-COPY main.js ./src/main.js
+RUN npm install && \
+    npm install -g jest && \
+    npm install -g @vue/cli && \
+    npm audit fix --force && \
+    npm install @vue/cli-plugin-unit-jest @vue/test-utils
 
 RUN npm run build
-
-COPY io.rs ../theseus/src/util/io.rs
-
-COPY main.rs ./src-tauri/src/main.rs
-
-COPY mod.rs ../theseus/src/launcher/mod.rs
-
-COPY profiles.rs ../theseus/src/state/profiles.rs
-
-COPY Cargo.toml ./src-tauri/Cargo.toml
 
 RUN curl --proto -y '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
     . "$HOME/.cargo/env" && cargo build --bin theseus_gui
