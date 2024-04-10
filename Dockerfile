@@ -23,14 +23,6 @@ COPY theseus_main ./theseus
 
 WORKDIR /usr/src/theseus/theseus_gui
 
-RUN npm install && \
-    npm install -g jest && \
-    npm install -g @vue/cli && \
-    npm audit fix --force && \
-    npm install @vue/cli-plugin-unit-jest @vue/test-utils
-
-RUN npm run build
-
 RUN curl --proto -y '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
     . "$HOME/.cargo/env" && cargo build --bin theseus_gui
 

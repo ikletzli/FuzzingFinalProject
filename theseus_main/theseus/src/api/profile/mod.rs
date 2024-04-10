@@ -17,6 +17,9 @@ use crate::{
     event::{emit::emit_profile, ProfilePayloadType},
     state::MinecraftChild,
 };
+use crate::{
+    state::{Profiles},
+};
 pub use crate::{
     state::{JavaSettings, Profile},
     State,
@@ -256,6 +259,13 @@ pub async fn get_optimal_jre_key(
         Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
             .as_error())
     }
+}
+
+/// Get a copy of the profile set
+#[tracing::instrument]
+pub async fn big_update() -> crate::Result<()> {
+    Profiles::update_projects().await;
+    Ok(())
 }
 
 /// Get a copy of the profile set

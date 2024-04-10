@@ -166,7 +166,6 @@ impl State {
         let users_fut = Users::init(&directories, &io_semaphore);
         let creds_fut = CredentialsStore::init(&directories, &io_semaphore);
         // Launcher data
-        println!("lol2");
         let (metadata, profiles, creds, users) = loading_join! {
             Some(&loading_bar), 70.0, Some("Loading metadata");
             metadata_fut,
@@ -174,11 +173,9 @@ impl State {
             creds_fut,
             users_fut
         }?;
-        println!("lol3");
 
         let auth_flow = AuthTask::new();
         let safety_processes = SafeProcesses::new();
-        println!("lol4");
 
         let discord_rpc = DiscordGuard::init(is_offline).await?;
         if !settings.disable_discord_rpc && !is_offline {
@@ -188,14 +185,11 @@ impl State {
         }
 
         let children = Children::new();
-        println!("lol5");
 
         // Starts a loop of checking if we are online, and updating
         Self::offine_check_loop();
-        println!("lol6");
 
         emit_loading(&loading_bar, 10.0, None).await?;
-        println!("lol7");
 
         Ok::<RwLock<Self>, crate::Error>(RwLock::new(Self {
             offline: RwLock::new(is_offline),

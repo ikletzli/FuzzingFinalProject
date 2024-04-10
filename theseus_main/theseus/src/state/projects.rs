@@ -302,35 +302,61 @@ pub async fn infer_data_from_files(
         let hash = format!("{:x}", hasher.finalize());
         file_path_hashes.insert(hash, path.clone());
     }
-
     let files_url = format!("{}version_files", MODRINTH_API_URL);
     let updates_url = format!("{}version_files/update", MODRINTH_API_URL);
-    let (files, update_versions) = tokio::try_join!(
-        fetch_json::<HashMap<String, ModrinthVersion>>(
-            Method::POST,
-            &files_url,
-            None,
-            Some(json!({
-                "hashes": file_path_hashes.keys().collect::<Vec<_>>(),
-                "algorithm": "sha512",
-            })),
-            fetch_semaphore,
-            credentials,
-        ),
-        fetch_json::<HashMap<String, ModrinthVersion>>(
-            Method::POST,
-            &updates_url,
-            None,
-            Some(json!({
-                "hashes": file_path_hashes.keys().collect::<Vec<_>>(),
-                "algorithm": "sha512",
-                "loaders": [profile.metadata.loader],
-                "game_versions": [profile.metadata.game_version]
-            })),
-            fetch_semaphore,
-            credentials,
-        )
-    )?;
+
+    let files =         fetch_json::<HashMap<String, ModrinthVersion>>(
+        Method::POST,
+        &files_url,
+        None,
+        Some(json!({
+            "hashes": file_path_hashes.keys().collect::<Vec<_>>(),
+            "algorithm": "sha512",
+        })),
+        fetch_semaphore,
+        credentials,
+    ).await?;
+
+    let update_versions =                 fetch_json::<HashMap<String, ModrinthVersion>>(
+        Method::POST,
+        &updates_url,
+        None,
+        Some(json!({
+            "hashes": file_path_hashes.keys().collect::<Vec<_>>(),
+            "algorithm": "sha512",
+            "loaders": [profile.metadata.loader],
+            "game_versions": [profile.metadata.game_version]
+        })),
+        fetch_semaphore,
+        credentials,
+    ).await?;
+
+    // let (files, update_versions) = tokio::try_join!(
+    //     fetch_json::<HashMap<String, ModrinthVersion>>(
+    //         Method::POST,
+    //         &files_url,
+    //         None,
+    //         Some(json!({
+    //             "hashes": file_path_hashes.keys().collect::<Vec<_>>(),
+    //             "algorithm": "sha512",
+    //         })),
+    //         fetch_semaphore,
+    //         credentials,
+    //     ),
+    //     fetch_json::<HashMap<String, ModrinthVersion>>(
+    //         Method::POST,
+    //         &updates_url,
+    //         None,
+    //         Some(json!({
+    //             "hashes": file_path_hashes.keys().collect::<Vec<_>>(),
+    //             "algorithm": "sha512",
+    //             "loaders": [profile.metadata.loader],
+    //             "game_versions": [profile.metadata.game_version]
+    //         })),
+    //         fetch_semaphore,
+    //         credentials,
+    //     )
+    // )?;
 
     let projects: Vec<ModrinthProject> = fetch_json(
         Method::GET,

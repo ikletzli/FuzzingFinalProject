@@ -836,6 +836,7 @@ impl Profiles {
                         &creds,
                     )
                     .await?;
+
                     drop(creds);
 
                     let mut new_profiles = state.profiles.write().await;
