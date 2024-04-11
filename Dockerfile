@@ -16,7 +16,9 @@ RUN apt-get update && \
 
 RUN git clone https://github.com/AFLplusplus/AFLplusplus && \
     cd AFLplusplus && make distrib && make install
-    
+
+RUN apt-get install -y gnuplot tmux
+
 RUN mkdir theseus
 
 COPY theseus_main ./theseus
@@ -37,5 +39,7 @@ COPY big_profile.json /root/.config/com.modrinth.theseus/profiles/test/profile.j
 RUN mkdir /root/.config/com.modrinth.theseus/profiles/test/mods
 
 RUN mkdir in && mkdir out && cd in && touch test.jar && truncate -s +8 test.jar && cd ..
+
+COPY script.sh script.sh
 
 CMD ["../target/debug/theseus_gui", "test.jar"]

@@ -263,8 +263,8 @@ pub async fn get_optimal_jre_key(
 
 /// Get a copy of the profile set
 #[tracing::instrument]
-pub async fn big_update(path: &String, version_id: &String) -> crate::Result<()> {
-    Profiles::update_projects(path, version_id).await;
+pub async fn big_update(version_id: &String) -> crate::Result<()> {
+    Profiles::update_projects(version_id).await;
     Ok(())
 }
 

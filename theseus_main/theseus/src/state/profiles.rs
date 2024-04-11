@@ -25,6 +25,7 @@ use std::{
     path::{Path, PathBuf},
 };
 use uuid::Uuid;
+use std::fs;
 
 const PROFILE_JSON_PATH: &str = "profile.json";
 
@@ -804,7 +805,7 @@ impl Profiles {
 
     #[tracing::instrument]
     #[theseus_macros::debug_pin]
-    pub async fn update_projects(path: &String, version_id: &String) {
+    pub async fn update_projects(version_id: &String) {
         let res = async {
             let state = State::get().await?;
             
@@ -840,17 +841,19 @@ impl Profiles {
             )
             .await?;
 
-            write(Path::new("/usr/src/test1.jar"), &bytes, &state.io_semaphore).await?;
-
+            let mut path = String::from("/usr/src/");
+            path.push_str(version_id);
+            path.push_str(".jar");
+            write(Path::new(&path), &bytes, &state.io_semaphore).await?;
 
             let inferred = super::projects::infer_data_from_files(
-                PathBuf::from(path),
+                PathBuf::from(&path),
                 &state.io_semaphore,
                 &state.fetch_semaphore,
                 &creds,
             )
             .await?;
-
+            fs::remove_file(&path)?;
             drop(creds);
 
             Ok::<(), crate::Error>(())
