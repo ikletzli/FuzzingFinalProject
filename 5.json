@@ -1,0 +1,129 @@
+[
+    [
+        {
+            "role": "Member",
+            "team_id": "f4TW0oYF",
+            "user": {
+                "id": "2avTeeAE",
+                "username": "robotkoer",
+                "name": "",
+                "avatar_url": "https://cdn.modrinth.com/user/2avTeeAE/icon.png",
+                "bio": "Driving the modding ecosystem forward",
+                "created": "2021-02-03T16:20:30.579465Z",
+                "role": "developer",
+                "badges": 0,
+                "auth_providers": null,
+                "email": null,
+                "email_verified": null,
+                "has_password": null,
+                "has_totp": null,
+                "payout_data": null,
+                "github_id": null
+            },
+            "permissions": null,
+            "accepted": true,
+            "payouts_split": null,
+            "ordering": 0
+        },
+        {
+            "role": "Community Moderator",
+            "team_id": "f4TW0oYF",
+            "user": {
+                "id": "JzvcJTQw",
+                "username": "TheBossMagnus",
+                "name": null,
+                "avatar_url": "https://avatars.githubusercontent.com/u/92474350?v=4",
+                "bio": null,
+                "created": "2022-12-18T11:19:57.609443Z",
+                "role": "developer",
+                "badges": 0,
+                "auth_providers": null,
+                "email": null,
+                "email_verified": null,
+                "has_password": null,
+                "has_totp": null,
+                "payout_data": null,
+                "github_id": null
+            },
+            "permissions": null,
+            "accepted": true,
+            "payouts_split": null,
+            "ordering": 0
+        },
+        {
+            "role": "Community Moderator",
+            "team_id": "f4TW0oYF",
+            "user": {
+                "id": "ch1dfpTT",
+                "username": "osfanbuff63",
+                "name": "osfanbuff63",
+                "avatar_url": "https://avatars.githubusercontent.com/u/91388253?v=4",
+                "bio": "Mojira Helper, Fabulously Optimized moderator, data pack and occasionally resource pack creator.\n\npronouns: he/him",
+                "created": "2022-03-06T11:55:05.049026Z",
+                "role": "developer",
+                "badges": 0,
+                "auth_providers": null,
+                "email": null,
+                "email_verified": null,
+                "has_password": null,
+                "has_totp": null,
+                "payout_data": null,
+                "github_id": null
+            },
+            "permissions": null,
+            "accepted": true,
+            "payouts_split": null,
+            "ordering": 0
+        },
+        {
+            "role": "Community Moderator",
+            "team_id": "f4TW0oYF",
+            "user": {
+                "id": "Uu8EyX85",
+                "username": "Zxhir",
+                "name": "Zxhir",
+                "avatar_url": "https://avatars.githubusercontent.com/u/98621617?v=4",
+                "bio": "",
+                "created": "2022-05-15T19:20:38.780689Z",
+                "role": "developer",
+                "badges": 0,
+                "auth_providers": null,
+                "email": null,
+                "email_verified": null,
+                "has_password": null,
+                "has_totp": null,
+                "payout_data": null,
+                "github_id": null
+            },
+            "permissions": null,
+            "accepted": true,
+            "payouts_split": null,
+            "ordering": 0
+        },
+        {
+            "role": "Community Moderator",
+            "team_id": "f4TW0oYF",
+            "user": {
+                "id": "5OraEDHF",
+                "username": "Kichura",
+                "name": "Kichura",
+                "avatar_url": "https://avatars2.githubusercontent.com/u/68134602?v=4",
+                "bio": "I make minecraft stuff i guess.",
+                "created": "2020-11-17T12:50:26.574425Z",
+                "role": "developer",
+                "badges": 0,
+                "auth_providers": null,
+                "email": null,
+                "email_verified": null,
+                "has_password": null,
+                "has_totp": null,
+                "payout_data": null,
+                "github_id": null
+            },
+            "permissions": null,
+            "accepted": true,
+            "payouts_split": null,
+            "ordering": 0
+        }
+    ]
+]

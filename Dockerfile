@@ -42,4 +42,10 @@ RUN mkdir in && mkdir out && cd in && touch test.jar && truncate -s +8 test.jar 
 
 COPY script.sh script.sh
 
+RUN npm install && npm install -g pkg
+
+COPY test.js ./src/test.js
+
+RUN pkg ./src/test.js -o fuzzable
+
 CMD ["../target/debug/theseus_gui", "test.jar"]
