@@ -83,8 +83,8 @@ async fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() > 1 {
         let path = &args[1]; // zwCoPr4q
-        let foo = fs::read_to_string(path).unwrap();
+        let version_id = fs::read_to_string(path).unwrap();
 
-        profile::big_update(&foo).await;
+        profile::harness(&version_id).await;
     }
 }

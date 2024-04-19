@@ -1,14 +1,24 @@
-docker build -t "image_name" .
-docker run -d --name mygtkapp -e DISPLAY=172.30.96.1:0 image_name (PC)
-docker run -d --name mygtkapp -e DISPLAY=192.168.56.1:0 image_name (Laptop)
 
-Xvfb :1 -screen 0 1024x768x16 (to start virtual monitor)
-DISPLAY=:1.0 ../target/debug/theseus_gui (to run gui on virtual monitor)
+## Build Docker image
+
+docker build -t "image_name" .
+
+### Get into the container
+
+docker run -it --name minecraft-fuzz image_name bash
+
+### Command for testing rust
 
 afl-fuzz -t 20000 -g 8 -G 8 -Q -i in -o out ../target/debug/theseus_gui @@
 
-afl-fuzz -Q -i in -o out ../target/debug/theseus_gui @@
+### Command for testing frontend
 
-docker run -it --name mygtkapp image_name bash 
+afl-fuzz -t 20000 -Q -i in -o out ./fuzzable @@
 
-echo "zwCoPr4q" >> new.jar && truncate -s 8 new.jar
+### Frontend harness
+
+test.js contains the frontend harness
+
+### Backend harness
+
+theseus_main/theseus_gui/src-tauri/src/main.rs contains the start to the backend harness

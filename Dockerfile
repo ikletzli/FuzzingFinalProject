@@ -2,6 +2,7 @@ FROM node:16 AS builder
 
 WORKDIR /usr/src
 
+# install dependencies to get everything to build
 RUN apt update && apt -y install libsoup2.4-dev && apt -y install libpango1.0-dev && \
 apt -y install libatk1.0-dev && apt -y install javascriptcoregtk-4.0 && apt -y install gdk-3.0
 
@@ -17,35 +18,27 @@ RUN apt-get update && \
 RUN git clone https://github.com/AFLplusplus/AFLplusplus && \
     cd AFLplusplus && make distrib && make install
 
+# install more dependendencies
 RUN apt-get install -y gnuplot tmux
 
+# Copy over the application
 RUN mkdir theseus
 
 COPY theseus_main ./theseus
 
 WORKDIR /usr/src/theseus/theseus_gui
 
+# get rust and build the application
 RUN curl --proto -y '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
     . "$HOME/.cargo/env" && cargo build --bin theseus_gui
 
-COPY test.jar test.jar
+# make the afl directories and 
+RUN mkdir in && mkdir out && cd in && echo "zwCoPr4q" >> new.jar && truncate -s 8 new.jar && cd ..
 
-COPY worldmap.jar worldmap.jar
-
-COPY crosshair.jar crosshair.jar
-
-COPY big_profile.json /root/.config/com.modrinth.theseus/profiles/test/profile.json
-
-RUN mkdir /root/.config/com.modrinth.theseus/profiles/test/mods
-
-RUN mkdir in && mkdir out && cd in && touch test.jar && truncate -s +8 test.jar && cd ..
-
-COPY script.sh script.sh
-
+# install pkg for building binary from javascript file
 RUN npm install && npm install -g pkg
 
+# Copy and build javascript file
 COPY test.js ./src/test.js
 
 RUN pkg ./src/test.js -o fuzzable
-
-CMD ["../target/debug/theseus_gui", "test.jar"]

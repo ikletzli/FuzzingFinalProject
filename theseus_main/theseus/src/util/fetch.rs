@@ -11,6 +11,8 @@ use std::path::{Path, PathBuf};
 use std::time::{self, Duration};
 use tokio::sync::{RwLock, Semaphore};
 use tokio::{fs::File, io::AsyncWriteExt};
+//uncomment to print json return from http request
+//use std::str;
 
 use super::io::{self, IOError};
 
@@ -80,6 +82,9 @@ where
         credentials,
     )
     .await?;
+
+    //uncomment to print json return from http request
+    //println!("{}", str::from_utf8(&result).unwrap());
     let value = serde_json::from_slice(&result)?;
     Ok(value)
 }
