@@ -1,5 +1,4 @@
-
-## Build Docker image
+### Build Docker image
 
 docker build -t "image_name" .
 
